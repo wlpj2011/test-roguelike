@@ -8,7 +8,7 @@ import tile_types
 import entity_factories
 
 if TYPE_CHECKING:
-    from entity import Entity
+    from engine import Engine
 
 class RectangularRoom:
     """returns a rectangular room with a corner at x,y and with given height and width"""
@@ -69,9 +69,9 @@ def generate_dungeon(max_rooms: int,
                     map_width: int,
                     map_height: int,
                     max_monsters_per_room: int,
-                    player: Entity)->GameMap:
-
-    dungeon = GameMap(map_width,map_height,entities = [player])
+                    engine: Engine)->GameMap:
+    player = engine.player
+    dungeon = GameMap(engine,map_width,map_height,entities = [player])
     rooms: List[RectangularRoom] = []
 
     for r in range(max_rooms):
@@ -87,7 +87,7 @@ def generate_dungeon(max_rooms: int,
         dungeon.tiles[new_room.inner] = tile_types.floor
 
         if len(rooms)==0:
-            player.x, player.y = new_room.center
+            player.place(*new_room.center,dungeon)
         else:
             for x,y in tunnel_between(new_room.center,rooms[-1].center):
                 dungeon.tiles[x,y] = tile_types.floor
