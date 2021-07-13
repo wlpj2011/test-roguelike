@@ -91,6 +91,7 @@ class GameOverEventHandler(EventHandler):
         action: Optional[Action] = None
 
         key = event.sym
+        player = self.engine.player
 
         if key == tcod.event.K_ESCAPE:
             action = EscapeAction(player)
