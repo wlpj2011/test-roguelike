@@ -42,6 +42,7 @@ def main() -> None:
                                    title = "Test Roguelike",
                                    vsync = True) as context:
         root_console = tcod.Console(screen_width, screen_height, order = "F")
+        engine.update_fov() # screen is dark until you move without this
         while True:
             engine.render(console=root_console, context = context)
             engine.event_handler.handle_events()
