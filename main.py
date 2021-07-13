@@ -1,11 +1,14 @@
 #! /usr/bin/env python3
 import copy
+
 import tcod
+
 from actions import EscapeAction, MovementAction
 import entity_factories
 from engine import Engine
 from procgen import generate_dungeon
 from input_handlers import EventHandler
+import color
 
 
 def main() -> None:
@@ -13,7 +16,7 @@ def main() -> None:
     screen_height = 50
 
     map_width = 80
-    map_height = 45
+    map_height = 43
 
     room_max_size = 10
     room_min_size = 6
@@ -34,7 +37,11 @@ def main() -> None:
         map_width=map_width,
         map_height=map_height,
         max_monsters_per_room=max_monsters_per_room,
-        engine=engine)
+        engine=engine
+    )
+
+    engine.update_fov() # screen is dark until you move without this
+    engine.message_log.add_message("Welcome to the dungeon",color.welcome_text)
 
     with tcod.context.new_terminal(screen_width,
                                    screen_height,
@@ -42,10 +49,12 @@ def main() -> None:
                                    title = "Test Roguelike",
                                    vsync = True) as context:
         root_console = tcod.Console(screen_width, screen_height, order = "F")
-        engine.update_fov() # screen is dark until you move without this
+
         while True:
-            engine.render(console=root_console, context = context)
-            engine.event_handler.handle_events()
+            root_console.clear()
+            engine.event_handler.on_render(console = root_console)
+            context.present(root_console)
+            engine.event_handler.handle_events(context)
 
 if __name__=="__main__":
     main()
