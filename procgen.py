@@ -37,8 +37,10 @@ def place_entities(
     room: RectangularRoom,
     dungeon: GameMap,
     maximum_monsters: int,
+    maximum_items: int,
     ) -> None:
     number_of_monsters = random.randint(0,maximum_monsters)
+    number_of_items = random.randint(0,maximum_items)
     for i in range(number_of_monsters):
         x = random.randint(room.x1 + 1,room.x2 - 1)
         y = random.randint(room.y1 + 1,room.y2 - 1)
@@ -47,6 +49,12 @@ def place_entities(
                 entity_factories.orc.spawn(dungeon,x,y)
             else:
                 entity_factories.troll.spawn(dungeon,x,y)
+
+    for i in range(number_of_items):
+        x = random.randint(room.x1 + 1,room.x2 - 1)
+        y = random.randint(room.y1 + 1,room.y2 - 1)
+        if not any(entity.x == x and entity.y ==y for entity in dungeon.entities):
+            entity_factories.health_potion.spawn(dungeon,x,y)
 
 def tunnel_between(start: Tuple[int,int],end: Tuple[int,int])->Iterator[Tuple[int,int]]:
     """Return an L-shaped tunnel between start and end"""
@@ -69,6 +77,7 @@ def generate_dungeon(max_rooms: int,
                     map_width: int,
                     map_height: int,
                     max_monsters_per_room: int,
+                    max_items_per_room: int,
                     engine: Engine)->GameMap:
     player = engine.player
     dungeon = GameMap(engine,map_width,map_height,entities = [player])
@@ -91,7 +100,7 @@ def generate_dungeon(max_rooms: int,
         else:
             for x,y in tunnel_between(new_room.center,rooms[-1].center):
                 dungeon.tiles[x,y] = tile_types.floor
-        place_entities(new_room,dungeon,max_monsters_per_room)
+        place_entities(new_room,dungeon,max_monsters_per_room, max_items_per_room)
         rooms.append(new_room)
 
     return dungeon
