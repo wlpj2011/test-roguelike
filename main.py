@@ -7,7 +7,8 @@ import tcod
 import entity_factories
 from engine import Engine
 from procgen import generate_dungeon
-from input_handlers import EventHandler
+import exceptions
+import input_handlers
 import color
 
 
@@ -45,25 +46,37 @@ def main() -> None:
     engine.update_fov() # screen is dark until you move without this
     engine.message_log.add_message("Welcome to the dungeon",color.welcome_text)
 
+    handler: input_handlers.BaseEventHandler = input_handlers.MainGameEventHandler(engine)
+
     with tcod.context.new_terminal(screen_width,
                                    screen_height,
                                    tileset=tileset,
                                    title = "Test Roguelike",
                                    vsync = True) as context:
         root_console = tcod.Console(screen_width, screen_height, order = "F")
+        try:
+            while True:
+                root_console.clear()
+                handler.on_render(console = root_console)
+                context.present(root_console)
 
-        while True:
-            root_console.clear()
-            engine.event_handler.on_render(console = root_console)
-            context.present(root_console)
+                try:
+                    for event in tcod.event.wait():
+                        context.convert_event(event)
+                        handler = handler.handle_events(event)
+                except Exception:
+                    traceback.print_exc()
+                    if isinstance(handler, input_handlers.EventHandler):
+                        handler.engine.message_log.add_message(traceback.format_exc(),color.error)
+        except exceptions.QuitWithoutSaving:
+            raise
+        except SystemExit:
+            # TODO: Add the save function here
+            raise
+        except BaseException:
+            # TODO: Add the save function here
+            raise
 
-            try:
-                for event in tcod.event.wait():
-                    context.convert_event(event)
-                    engine.event_handler.handle_events(event)
-            except Exception:
-                traceback.print_exc()
-                engine.message_log.add_message(traceback.format_exc(),color.error)
 
 if __name__=="__main__":
     main()
