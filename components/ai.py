@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import List, Tuple,TYPE_CHECKING
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
+import random
 import numpy as np
 import tcod
 
-from actions import Action,MeleeAction,MovementAction,WaitAction
+from actions import Action, BumpAction, MeleeAction, MovementAction, WaitAction
 
 if TYPE_CHECKING:
     from entity import Actor
@@ -28,6 +29,38 @@ class BaseAI(Action):
 
         path: List[List[int]] = pathfinder.path_to((dest_x,dest_y))[1:].tolist()
         return [(index[0],index[1]) for index in path]
+
+class ConfusedEnemy(BaseAI):
+    """ A confused enemy will stumble around aimlessly for a given number of turns, then revert back to its previous AI.
+    If an actor occupies a tile it is randomly moving into, it will attack. """
+
+    def __init__(
+        self, entity: Actor, previous_ai: Optional[BaseAI], turns_remaining: int
+    ):
+        super().__init__(entity)
+        self.previous_ai = previous_ai
+        self.turns_remaining = turns_remaining
+
+    def perform(self)->None:
+        if self.turns_remaining <= 0:
+            self.engine.message_log.add_message(f"The {self.entity.name} is no longer confused.")
+            self.entity.ai = self.previous_ai
+        else:
+            direction_x, direction_y = random.choice(
+                [
+                    (-1,-1),
+                    (0,-1),
+                    (1,-1),
+                    (-1,0),
+                    (1,0),
+                    (-1,1),
+                    (0,1),
+                    (1,1),
+                ]
+            )
+            self.turns_remaining -= 1
+            return BumpAction(self.entity, direction_x, direction_y,).perform()
+
 
 class HostileEnemy(BaseAI):
     def __init__(self,entity:Actor):

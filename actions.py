@@ -57,7 +57,7 @@ class ItemAction(Action):
 
     @property
     def target_actor(self)->Optional[Actor]:
-        return self.engine.game_map.get_actor_at_location(*self.location_xy)
+        return self.engine.game_map.get_actor_at_location(*self.target_xy)
 
     def perform(self) -> None:
         self.item.consumable.activate(self)
