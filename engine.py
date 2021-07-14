@@ -5,6 +5,7 @@ from tcod.context import Context
 from tcod.console import Console
 from tcod.map import compute_fov
 
+import exceptions
 from input_handlers import MainGameEventHandler
 from render_functions import render_bar,render_names_at_mouse_location
 from message_log import MessageLog
@@ -23,10 +24,12 @@ class Engine:
         self.player = player
         self.mouse_location = (0,0)
 
-    def handle_enemy_turn(self)->None:
+    def handle_enemy_turns(self)->None:
         for entity in set(self.game_map.actors) - {self.player}:
-            if entity.ai:
+            try:
                 entity.ai.perform()
+            except exceptions.Impossible:
+                pass
 
     def update_fov(self)-> None:
         self.game_map.visible[:] = compute_fov(
