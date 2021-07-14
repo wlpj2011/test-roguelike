@@ -4,7 +4,6 @@ import traceback
 
 import tcod
 
-from actions import EscapeAction, MovementAction
 import entity_factories
 from engine import Engine
 from procgen import generate_dungeon

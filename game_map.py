@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from engine import Engine
     from entity import Entity
 
-from entity import Actor
+from entity import Actor, Item
 import tile_types
 
 class GameMap:
@@ -30,10 +30,13 @@ class GameMap:
     @property
     def actors(self)->Iterator[Actor]:
         yield from(
-            entity
-            for entity in self.entities
+            entity for entity in self.entities
             if isinstance(entity,Actor) and entity.is_alive
         )
+
+    @property
+    def items(self)->Iterator[Item]:
+        yield from (entity for entity in self.entities if isinstance(entity,Item))
 
     def get_blocking_entity_at_location(self, location_x: int, location_y: int)->Optional[Entity]:
         for entity in self.entities:

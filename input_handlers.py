@@ -1,12 +1,19 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 import tcod.event
-from actions import Action, EscapeAction, BumpAction, WaitAction
+from actions import (
+    Action,
+    BumpAction,
+    WaitAction,
+    PickupAction,
+    DropItem,
+)
 import color
 import exceptions
 
 if TYPE_CHECKING:
     from engine import Engine
+    from entity import Item
 
 MOVE_KEYS = {
     tcod.event.K_UP: (0,-1),
@@ -81,6 +88,96 @@ class EventHandler(tcod.event.EventDispatch[Action]):
     def on_render(self,console: tcod.Console) -> None:
         self.engine.render(console)
 
+class AskUserEventHandler(EventHandler):
+    """Handles user input for actions which require special input."""
+
+    def handle_action(self, action: Optional[Action])->bool:
+        """Return to the main event handler when a valid action was performed."""
+        if super().handle_action(action):
+            self.engine.event_handler = MainGameEventHandler(self.engine)
+            return True
+        return False
+
+    def ev_keydown(self,event: tcod.event.KeyDown)->Optional[Action]:
+        if event.sym in {
+            tcod.event.K_LSHIFT,
+            tcod.event.K_RSHIFT,
+            tcod.event.K_LCTRL,
+            tcod.event.K_RCTRL,
+            tcod.event.K_LALT,
+            tcod.event.K_RALT,
+        }:
+            return None
+        return self.on_exit()
+
+    def ev_mousebuttondown(self,event: tcod.event.MouseButtonDown)->Optional[Action]:
+        return self.on_exit()
+
+    def on_exit(self)->Optional[Action]:
+        self.engine.event_handler = MainGameEventHandler(self.engine)
+        return None
+
+class InventoryEventHandler(AskUserEventHandler):
+    TITLE = "<Missing Title>"
+
+    def on_render(self, console: tcod.Console)-> None:
+        super().on_render(console)
+        number_of_items_in_inventory = len(self.engine.player.inventory.items)
+
+        height = number_of_items_in_inventory + 2
+        if height <= 3:
+            height = 3
+        if self.engine.player.x <= 30:
+            x = 40
+        else:
+            x = 0
+        y = 0
+        width = len(self.TITLE) + 4
+
+        console.draw_frame(
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            title = self.TITLE,
+            clear = True,
+            fg = (255,255,255),
+            bg = (0,0,0),
+        )
+
+        if number_of_items_in_inventory > 0:
+            for i, item in enumerate(self.engine.player.inventory.items):
+                item_key = chr(ord("a")+i)
+                console.print(x+1, y+i+1,f"({item_key}) {item.name}")
+        else:
+            console.print(x+1,y+1,"(Empty)")
+
+    def ev_keydown(self, event: tcod.event.KeyDown)->Optional[Action]:
+        player = self.engine.player
+        key = event.sym
+        index = key - tcod.event.K_a
+        if 0<=index<=26:
+            try:
+                selected_item = player.inventory.items[index]
+            except IndexError:
+                self.engine.message_log.add_message("Invalid Entry.",color.invalid)
+                return None
+            return self.on_item_selected(selected_item)
+        return super().ev_keydown(event)
+
+    def on_item_selected(self, item:Item)->Optional[Action]:
+        raise NotImplementedError
+
+class InventoryActivateHandler(InventoryEventHandler):
+    TITLE = "Select an item to use"
+    def on_item_selected(self,item: Item)->Optional[Action]:
+        return item.consumable.get_action(self.engine.player)
+
+class InventoryDropHandler(InventoryEventHandler):
+    TITLE = "Select an item to drop"
+    def on_item_selected(self,item:Item)->Optional[Action]:
+        return DropItem(self.engine.player,item)
+
 class MainGameEventHandler(EventHandler):
     def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[Action]:
         action: Optional[Action] = None
@@ -95,7 +192,13 @@ class MainGameEventHandler(EventHandler):
         elif key in WAIT_KEYS:
             action = WaitAction(player)
         elif key == tcod.event.K_ESCAPE:
-            action = EscapeAction(player)
+            raise SystemExit()
+        elif key == tcod.event.K_g:
+            action = PickupAction(player)
+        elif key == tcod.event.K_i:
+            self.engine.event_handler = InventoryActivateHandler(self.engine)
+        elif key == tcod.event.K_d:
+            self.engine.event_handler = InventoryDropHandler(self.engine)
         elif key == tcod.event.K_v:
             self.engine.event_handler = HistoryViewer(self.engine)
 
