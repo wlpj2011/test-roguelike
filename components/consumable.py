@@ -44,3 +44,26 @@ class HealingConsumable(Consumable):
             self.consume()
         else:
             raise Impossible("Your health is already full.")
+
+class LightningDamageConsumable(Consumable):
+    def __init__(self,damage: int, maximum_range: int):
+        self.damage = damage
+        self.maximum_range = maximum_range
+
+    def activate(self, action: actions.ItemAction)->None:
+        consumer = action.entity
+        target = None
+        closest_distance = self.maximum_range +1.0
+
+        for actor in self.engine.game_map.actors:
+            if actor is not consumer and self.parent.game_map.visible[actor.x,actor.y]:
+                distance = consumer.distance(actor.x,actor.y)
+                if distance < closest_distance:
+                    target = actor
+                    closest_distance = distance
+        if target:
+            self.engine.message_log.add_message(f"A lightning bolt strikes the {target.name} for {self.damage} damage.")
+            target.fighter.take_damage(self.damage)
+            self.consume()
+        else:
+            raise Impossible("No enemy close enough to strike.")
