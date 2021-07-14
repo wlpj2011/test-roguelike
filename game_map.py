@@ -24,6 +24,10 @@ class GameMap:
         self.explored = np.full((width,height),fill_value = False, order = "F")
 
     @property
+    def game_map(self):
+        return self
+
+    @property
     def actors(self)->Iterator[Actor]:
         yield from(
             entity
