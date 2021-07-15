@@ -9,6 +9,9 @@ import exceptions
 from render_functions import render_bar,render_names_at_mouse_location
 from message_log import MessageLog
 
+import lzma
+import pickle
+
 if TYPE_CHECKING:
     from game_map import GameMap
     from entity import Actor
@@ -45,3 +48,9 @@ class Engine:
         )
         render_names_at_mouse_location(console=console, x=21, y=44, engine = self)
         self.message_log.render(console = console, x=21, y=45, width = 40, height = 5)
+
+    def save_as(self, filename:str)->None:
+        """Save this Engine instance as a compressed file."""
+        save_data = lzma.compress(pickle.dumps(self))
+        with open(filename, "wb") as f:
+            f.write(save_data)

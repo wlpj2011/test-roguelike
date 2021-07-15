@@ -33,7 +33,6 @@ class Consumable(BaseComponent):
         if isinstance(inventory, components.inventory.Inventory):
             inventory.items.remove(entity)
 
-
 class HealingConsumable(Consumable):
     def __init__(self, amount: int):
         self.amount = amount

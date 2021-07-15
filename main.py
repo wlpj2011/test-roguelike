@@ -1,52 +1,27 @@
 #! /usr/bin/env python3
-import copy
 import traceback
 
 import tcod
 
-import entity_factories
-from engine import Engine
-from procgen import generate_dungeon
+import setup_game
 import exceptions
 import input_handlers
 import color
 
+def save_game(handler: input_handlers.BaseEventHandler, filename: str)->None:
+    """If the current event handler has an active Engine then save it."""
+    if isinstance(handler, input_handlers.BaseEventHandler):
+        handler.engine.save_as(filename)
+        print("Game saved.")
 
 def main() -> None:
     screen_width = 80
     screen_height = 50
 
-    map_width = 80
-    map_height = 43
-
-    room_max_size = 10
-    room_min_size = 6
-    max_rooms = 30
-
-    max_monsters_per_room = 2
-    max_items_per_room = 2
-
     tileset = tcod.tileset.load_tilesheet("dejavu10x10_gs_tc.png",
                                           32, 8, tcod.tileset.CHARMAP_TCOD)
 
-    player = copy.deepcopy(entity_factories.player)
-    engine = Engine(player = player)
-
-    engine.game_map = generate_dungeon(
-        max_rooms=max_rooms,
-        room_min_size=room_min_size,
-        room_max_size=room_max_size,
-        map_width=map_width,
-        map_height=map_height,
-        max_monsters_per_room=max_monsters_per_room,
-        max_items_per_room=max_items_per_room,
-        engine=engine
-    )
-
-    engine.update_fov() # screen is dark until you move without this
-    engine.message_log.add_message("Welcome to the dungeon",color.welcome_text)
-
-    handler: input_handlers.BaseEventHandler = input_handlers.MainGameEventHandler(engine)
+    handler: input_handlers.BaseEventHandler = setup_game.MainMenu()
 
     with tcod.context.new_terminal(screen_width,
                                    screen_height,
@@ -71,10 +46,10 @@ def main() -> None:
         except exceptions.QuitWithoutSaving:
             raise
         except SystemExit:
-            # TODO: Add the save function here
+            save_game(handler,"savegame.sav")
             raise
         except BaseException:
-            # TODO: Add the save function here
+            save_game(handler,"savegame.sav")
             raise
 
 
