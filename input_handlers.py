@@ -11,6 +11,7 @@ from actions import (
     WaitAction,
     PickupAction,
     DropItem,
+    TakeStairsAction,
 )
 import color
 import exceptions
@@ -325,8 +326,12 @@ class MainGameEventHandler(EventHandler):
         action: Optional[Action] = None
 
         key = event.sym
+        modifier = event.mod
 
         player = self.engine.player
+
+        if key == tcod.event.K_PERIOD and (tcod.event.K_LSHIFT | tcod.event.K_RSHIFT):
+            return TakeStairsAction(player)
 
         if key in MOVE_KEYS:
             dx,dy = MOVE_KEYS[key]
@@ -345,6 +350,7 @@ class MainGameEventHandler(EventHandler):
             return HistoryViewer(self.engine)
         elif key == tcod.event.K_SLASH:
             return LookHandler(self.engine)
+
 
         return action
 
