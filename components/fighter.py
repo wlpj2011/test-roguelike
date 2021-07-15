@@ -50,6 +50,7 @@ class Fighter(BaseComponent):
             death_message = f"{self.parent.name} is dead"
             death_message_color = color.enemy_die
 
+
         self.parent.char = "%"
         self.parent.color = (191,0,0)
         self.parent.blocks_movement = False
@@ -58,3 +59,4 @@ class Fighter(BaseComponent):
         self.parent.render_order = RenderOrder.CORPSE
 
         self.engine.message_log.add_message(death_message,death_message_color)
+        self.engine.player.level.add_xp(self.parent.level.xp_given)
