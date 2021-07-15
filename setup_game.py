@@ -15,7 +15,7 @@ import entity_factories
 import input_handlers
 from game_map import GameWorld
 
-background_image = tcod.image.load("menu_background.png")[:, :, :3]
+background_image = tcod.image.load("assets/menu_background.png")[:, :, :3]
 
 def new_game()->Engine:
     """Return a brand new game session as an Engine instance."""
