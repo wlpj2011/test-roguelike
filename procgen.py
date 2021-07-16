@@ -153,20 +153,22 @@ def generate_dungeon(max_rooms: int,
         dungeon.tiles[new_room.inner] = tile_types.floor
 
         if len(rooms)==0:
-            player.place(*new_room.center,dungeon)
+            pass
         else:
             for x,y in tunnel_between(new_room.center,rooms[-1].center):
                 dungeon.tiles[x,y] = tile_types.floor
             center_of_last_room = new_room.center
-            if len(rooms)==0:
-                dungeon.upstairs_location = new_room.center
-                dungeon.tiles[new_room.center] = tile_types.up_stairs
 
         place_entities(new_room,dungeon,engine.game_world.current_floor)
         rooms.append(new_room)
 
-        dungeon.tiles[center_of_last_room] = tile_types.down_stairs
-        dungeon.downstairs_location = center_of_last_room
+    dungeon.downstairs_location = center_of_last_room
+    dungeon.tiles[center_of_last_room] = tile_types.down_stairs
+
+    dungeon.upstairs_location = rooms[0].center
+    print(engine.game_world.current_floor)
+    if engine.game_world.current_floor > 1:
+        dungeon.tiles[dungeon.upstairs_location] = tile_types.up_stairs
 
 
     return dungeon

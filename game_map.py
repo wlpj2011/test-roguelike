@@ -49,7 +49,7 @@ class GameWorld:
             map_height = self.map_height,
             engine = self.engine
         )
-        self.max_floor = self.game_levels.append(self.engine.game_map)
+        self.game_levels.append(self.engine.game_map)
 
 class GameMap:
     def __init__(self, engine: Engine, width:int, height:int, entities: Iterable[Entity] = ()):
