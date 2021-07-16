@@ -11,7 +11,8 @@ from actions import (
     WaitAction,
     PickupAction,
     DropItem,
-    TakeStairsAction,
+    TakeUpStairsAction,
+    TakeDownStairsAction,
     EquipAction
     ## TODO: convert all to action.Action
 )
@@ -445,7 +446,9 @@ class MainGameEventHandler(EventHandler):
         player = self.engine.player
 
         if key == tcod.event.K_PERIOD and modifier & (tcod.event.K_LSHIFT | tcod.event.K_RSHIFT):
-            return TakeStairsAction(player)
+            return TakeDownStairsAction(player)
+        if key == tcod.event.K_COMMA and modifier & (tcod.event.K_LSHIFT | tcod.event.K_RSHIFT):
+            return TakeUpStairsAction(player)
 
         if key in MOVE_KEYS:
             dx,dy = MOVE_KEYS[key]

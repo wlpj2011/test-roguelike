@@ -22,7 +22,9 @@ class GameWorld:
         max_rooms: int,
         room_min_size: int,
         room_max_size: int,
-        current_floor: int = 0,
+        current_floor: int = 1,
+        max_floor: int = 0,
+        game_levels: List[GameMap] = []
     ):
         self.engine = engine
         self.map_width = map_width
@@ -31,11 +33,13 @@ class GameWorld:
         self.room_min_size = room_min_size
         self.room_max_size = room_max_size
         self.current_floor = current_floor
+        self.max_floor = max_floor
+        self.game_levels = game_levels
 
     def generate_floor(self)->None:
         from procgen import generate_dungeon
 
-        self.current_floor += 1
+        self.max_floor += 1
 
         self.engine.game_map = generate_dungeon(
             max_rooms = self.max_rooms,
@@ -45,6 +49,7 @@ class GameWorld:
             map_height = self.map_height,
             engine = self.engine
         )
+        self.max_floor = self.game_levels.append(self.engine.game_map)
 
 class GameMap:
     def __init__(self, engine: Engine, width:int, height:int, entities: Iterable[Entity] = ()):
@@ -58,6 +63,7 @@ class GameMap:
         self.explored = np.full((width,height),fill_value = False, order = "F")
 
         self.downstairs_location = (0,0)
+        self.upstairs_location = (0,0)
 
     @property
     def game_map(self):

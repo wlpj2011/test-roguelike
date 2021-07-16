@@ -81,12 +81,25 @@ class WaitAction(Action):
     def perform(self)->None:
         pass
 
-class TakeStairsAction(Action):
+class TakeDownStairsAction(Action):
     def perform(self)->None:
         """Take the stairs, if any exist at the entity's location."""
         if(self.entity.x,self.entity.y)==self.engine.game_map.downstairs_location:
-            self.engine.game_world.generate_floor()
+            if self.engine.game_world.current_floor == self.engine.game_world.max_floor:
+                self.engine.game_world.generate_floor()
+            self.engine.game_world.current_floor+=1
+            self.engine.game_map = self.engine.game_world.game_levels[self.engine.game_world.current_floor - 1]
             self.engine.message_log.add_message(f"You descend the staircase and enter the {self.engine.game_world.current_floor} floor.", color.descend)
+        else:
+            raise exceptions.Impossible("There are no stairs here.")
+
+class TakeUpStairsAction(Action):
+    def perform(self)->None:
+        """Take the stairs, if any exist at the entity's location."""
+        if(self.entity.x,self.entity.y)==self.engine.game_map.upstairs_location:
+            self.engine.game_world.current_floor -=1
+            self.engine.game_map = self.engine.game_world.game_levels[self.engine.game_world.current_floor - 1]
+            self.engine.message_log.add_message(f"You ascend the staircase and enter the {self.engine.game_world.current_floor} floor.", color.descend)
         else:
             raise exceptions.Impossible("There are no stairs here.")
 
