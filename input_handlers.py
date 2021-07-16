@@ -212,10 +212,10 @@ class CharacterScreenEventHandler(AskUserEventHandler):
             x = x + 1, y = y + 3, string=f"XP for next Level: {self.engine.player.level.experience_to_next_level}"
         )
         console.print(
-            x=x + 1, y=y + 4, string=f"Attack: {self.engine.player.fighter.power}"
+            x=x + 1, y=y + 4, string=f"Strength: {self.engine.player.fighter.base_strength}"
         )
         console.print(
-            x=x + 1, y=y + 5, string=f"Defense: {self.engine.player.fighter.defense}"
+            x=x + 1, y=y + 5, string=f"Agility: {self.engine.player.fighter.base_agility}"
         )
 
 class LevelUpEventHandler(AskUserEventHandler):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional,Tuple,TYPE_CHECKING
+import random
 
 import color
 import exceptions
@@ -130,20 +131,33 @@ class ActionWithDirection(Action):
 class MeleeAction(ActionWithDirection):
     def perform(self)->None:
         target = self.target_actor
-        if not target:
-            raise exceptions.Impossible("Nothing to Attack")
-
-        damage = self.entity.fighter.power - target.fighter.defense
-        attack_desc = f"{self.entity.name.capitalize()} attacks {target.name}"
         if self.entity is self.engine.player:
             attack_color = color.player_atk
         else:
             attack_color = color.enemy_atk
-        if damage > 0:
-            self.engine.message_log.add_message(f"{attack_desc} for {damage} hit points.",attack_color)
-            target.fighter.hp -= damage
+
+        attack_desc = f"{self.entity.name.capitalize()} attacks {target.name}"
+
+        if not target:
+            raise exceptions.Impossible("Nothing to Attack")
+
+        # TODO: Change this method, really don't like this, or maybe just needs balancing
+        if random.randint(1,20) + self.entity.fighter.strength_mod >= target.fighter.defense:
+            damage_die = self.entity.fighter.damage_die
+            die_number = self.entity.fighter.die_number
+            damage = 0
+            for i in range(die_number):
+                damage += random.randint(1,damage_die)
+
+            damage = damage + self.entity.fighter.damage_mod - target.fighter.resistance
+
+            if damage > 0:
+                self.engine.message_log.add_message(f"{attack_desc} for {damage} hit points.",attack_color)
+                target.fighter.hp -= damage
+            else:
+                self.engine.message_log.add_message(f"{attack_desc} but does no damage",attack_color)
         else:
-            self.engine.message_log.add_message(f"{attack_desc} but does no damage",attack_color)
+            self.engine.message_log.add_message(f"{attack_desc} but misses.",attack_color)
 
 class MovementAction(ActionWithDirection):
     def perform(self)->None:
