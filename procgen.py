@@ -166,7 +166,6 @@ def generate_dungeon(max_rooms: int,
     dungeon.tiles[center_of_last_room] = tile_types.down_stairs
 
     dungeon.upstairs_location = rooms[0].center
-    print(engine.game_world.current_floor)
     if engine.game_world.current_floor > 1:
         dungeon.tiles[dungeon.upstairs_location] = tile_types.up_stairs
 
