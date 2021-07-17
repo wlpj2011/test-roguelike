@@ -14,9 +14,9 @@ player = Actor(
     equipment = Equipment(),
     fighter = Fighter(
         hp = 30,
-        resistance = 1,
-        base_agility = 11,
-        base_strength = 11,
+        resistance = 0,
+        base_agility = 14,
+        base_strength = 16,
         damage_die = 4,
         die_number = 1,
     ),
@@ -24,6 +24,23 @@ player = Actor(
     level = Level(level_up_base = 200),
 )
 
+goblin = Actor(
+    char = "g",
+    color = (63,127,63),
+    name = "Goblin",
+    ai_cls = HostileEnemy,
+    equipment = Equipment(),
+    fighter = Fighter(
+        hp = 5,
+        resistance = 0,
+        base_agility = 11,
+        base_strength = 10,
+        damage_die = 4,
+        die_number = 1,
+    ),
+    inventory = Inventory(capacity = 0),
+    level = Level(xp_given = 20),
+)
 
 orc = Actor(
     char = "o",

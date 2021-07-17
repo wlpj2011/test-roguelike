@@ -82,4 +82,19 @@ class HostileEnemy(BaseAI):
             dest_x,dest_y = self.path.pop(0)
             return MovementAction(self.entity,dest_x - self.entity.x,dest_y-self.entity.y).perform()
 
+        # direction_x, direction_y = random.choice(
+        #     [
+        #         (-1,-1),
+        #         (0,-1),
+        #         (1,-1),
+        #         (-1,0),
+        #         (1,0),
+        #         (-1,1),
+        #         (0,1),
+        #         (1,1),
+        #     ]
+        # )
+        # TODO: Implement random motion when can't see player.
+        # return BumpAction(self.entity, direction_x, direction_y,).perform()
+
         return WaitAction(self.entity).perform()

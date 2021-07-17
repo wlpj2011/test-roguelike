@@ -81,7 +81,8 @@ class EquipAction(ItemAction):
 
 class WaitAction(Action):
     def perform(self)->None:
-        pass
+        if random.random()<0.2: #regen rate
+            self.entity.fighter.heal(1)
 
 class TakeDownStairsAction(Action):
     def perform(self)->None:
@@ -170,6 +171,8 @@ class MovementAction(ActionWithDirection):
             raise exceptions.Impossible("That way is blocked.")
 
         self.entity.move(self.dx,self.dy)
+        if random.random()<0.05: #regen rate
+            self.entity.fighter.heal(1)
 
 class BumpAction(ActionWithDirection):
     def perform(self)->None:
