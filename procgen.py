@@ -111,7 +111,7 @@ def place_entities(
     for entity in monsters + items:
         x = random.randint(room.x1 + 1,room.x2 - 1)
         y = random.randint(room.y1 + 1,room.y2 - 1)
-        if not any(entity.x == x and entity.y ==y for entity in dungeon.entities):
+        if (not any(entity.x == x and entity.y ==y for entity in dungeon.entities)) and (not (x ,y)== dungeon.upstairs_location):
             entity.spawn(dungeon,x,y)
 
 def tunnel_between(start: Tuple[int,int],end: Tuple[int,int])->Iterator[Tuple[int,int]]:
@@ -158,9 +158,10 @@ def generate_dungeon(max_rooms: int,
             for x,y in tunnel_between(new_room.center,rooms[-1].center):
                 dungeon.tiles[x,y] = tile_types.floor
             center_of_last_room = new_room.center
-
-        place_entities(new_room,dungeon,engine.game_world.current_floor)
         rooms.append(new_room)
+
+    for room in rooms:
+        place_entities(room,dungeon,engine.game_world.current_floor)
 
     dungeon.downstairs_location = center_of_last_room
     dungeon.tiles[center_of_last_room] = tile_types.down_stairs
