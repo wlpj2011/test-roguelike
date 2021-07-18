@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import random
+
 from components.base_component import BaseComponent
 from render_order import RenderOrder
 import color
@@ -13,20 +15,44 @@ class Fighter(BaseComponent):
     parent: Actor
 
     def __init__(
-        self, hp: int,
-        resistance: int,
-        base_agility: int,
+        self,
+        hit_dice_num: int,
+        hit_dice_size: int,
         base_strength: int,
-        damage_die: int,
-        die_number: int,
+        base_dexterity: int,
+        base_constitution: int,
+        base_intelligence: int,
+        damage_die_size: int,
+        damage_die_number: int,
+        resistance: int = 0,
     ):
-        self.max_hp = hp
-        self.hp = hp
-        self.resistance = resistance
-        self.base_agility = base_agility
+        self.max_hp = 0
+        self.hp = 0
+        self.hit_dice_num = hit_dice_num
+        self.hit_dice_size = hit_dice_size
         self.base_strength = base_strength
-        self.damage_die = damage_die
-        self.die_number = die_number
+        self.base_dexterity = base_dexterity
+        self.base_constitution = base_constitution
+        self.base_intelligence = base_intelligence
+        self.damage_die_size = damage_die_size
+        self.damage_die_number = damage_die_number
+        self.resistance = resistance
+
+    @property
+    def strength_mod(self)->int:
+        return (self.base_strength - 10)//2
+
+    @property
+    def dexterity_mod(self)->int:
+        return (self.base_dexterity - 10)//2
+
+    @property
+    def constitution_mod(self)->int:
+        return (self.base_constitution - 10)//2
+
+    @property
+    def intellignece_mod(self)->int:
+        return (self.base_intelligence - 10)//2
 
     @property
     def hp(self)->int:
@@ -38,17 +64,22 @@ class Fighter(BaseComponent):
         if self._hp == 0 and self.parent.ai:
             self.die()
 
-    @property
-    def defense_mod(self)->int:
-        return (self.base_agility - 10)//2
+    def set_max_hp(self):
+        if self.max_hp:
+            old_max_hp = self.max_hp
+
+        self.max_hp = hit_dice_size
+        for i in range(1,hit_dice_num):
+            self.max_hp += random.randint(1,hit_dice_size)
+
+        if not self.hp:
+            self.hp = self.max_hp
+        if old_max_hp:
+            heal(self,self.max_hp - old_max_hp)
 
     @property
     def defense(self)->int:
-        return 10 + self.defense_mod + self.defense_bonus
-
-    @property
-    def strength_mod(self)->int:
-        return (self.base_strength - 10)//2
+        return 10 + self.dexterity_mod + self.defense_bonus
 
     @property
     def damage_mod(self)->int:
