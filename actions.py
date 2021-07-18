@@ -44,7 +44,12 @@ class PickupAction(Action):
                     raise exceptions.Impossible("Your inventory is full")
                 self.engine.game_map.entities.remove(item)
                 item.parent = self.entity.inventory
-                inventory.items.append(item)
+
+                if item.name in inventory.items:
+                    inventory.items[item.name][0] += 1
+                else:
+                    inventory.items[item.name] = [1,item]
+
                 self.engine.message_log.add_message(f"You picked up the {item.name}.")
                 return
         raise exceptions.Impossible("There is nothing here to pick up.")
