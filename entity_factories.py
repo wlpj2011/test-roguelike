@@ -132,7 +132,7 @@ leather_armor = Item(
 )
 
 chain_mail = Item(
-    char = "[]",
+    char = "[",
     color = (139,69,19),
     name = "Chain Mail",
     equippable = equippable.ChainMail()
