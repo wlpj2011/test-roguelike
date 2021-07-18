@@ -308,17 +308,19 @@ class InventoryEventHandler(AskUserEventHandler):
 
         if number_of_items_in_inventory > 0:
             inventory = self.engine.player.inventory.items
-            i=0
-            for (item_name,(item_num,item)) in inventory.items():
+            for i,item_name in enumerate(self.engine.player.inventory.item_names):
                 item_key = chr(ord("a")+i)
-                is_equipped = self.engine.player.equipment.item_is_equipped(item)
-                item_string = f"({item_key}) {item_num}x {item_name}"
+                for item in self.engine.player.inventory.items:
+                    if item.name == item_name:
+                        selected_item = item
+                        pass
+                is_equipped = self.engine.player.equipment.item_is_equipped(selected_item)
+                item_string = f"({item_key}) {self.engine.player.inventory.item_num(item_name)}x {item_name}"
 
                 if is_equipped:
                     item_string = f"{item_string} (E)"
 
                 console.print(x+1, y+i+1,item_string)
-                i+=1
         else:
             console.print(x+1,y+1,"(Empty)")
 
@@ -328,8 +330,11 @@ class InventoryEventHandler(AskUserEventHandler):
         index = key - tcod.event.K_a
         if 0<=index<=26:
             try:
-                selected_item = list(player.inventory.items.keys())[index]
-                selected_item = player.inventory.items[selected_item][1]
+                selected_item_name = player.inventory.item_names[index]
+                for item in player.inventory.items:
+                    if item.name == selected_item_name:
+                        selected_item = item
+                        pass
             except IndexError:
                 self.engine.message_log.add_message("Invalid Entry.",color.invalid)
                 return None

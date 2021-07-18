@@ -60,13 +60,19 @@ class Entity:
         return clone
 
     def place(self, x: int, y: int, game_map: Optional[GameMap] = None):
-        self.x = x
-        self.y = y
         if game_map:
             if hasattr(self,"parent"):
                 if self.parent is self.game_map:
                     self.game_map.entities.remove(self)
             self.parent = game_map
+        if self.name != "Player":
+            clone = copy.deepcopy(self)
+            clone.x = x
+            clone.y = y
+            game_map.entities.add(clone)
+        else:
+            self.x = x
+            self.y = y
             game_map.entities.add(self)
 
     def distance(self, x: int, y: int)->float:

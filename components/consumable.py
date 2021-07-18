@@ -31,10 +31,7 @@ class Consumable(BaseComponent):
         entity = self.parent
         inventory = entity.parent
         if isinstance(inventory, components.inventory.Inventory):
-            if entity.name in inventory.items:
-                inventory.items[entity.name][0] -= 1
-            if inventory.items[entity.name][0] == 0:
-                inventory.items.pop(entity.name)
+            inventory.items.remove(entity)
 
 class HealingConsumable(Consumable):
     def __init__(self, amount: int):
