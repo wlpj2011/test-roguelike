@@ -113,7 +113,7 @@ def place_entities(
         y = random.randint(room.y1 + 1,room.y2 - 1)
         if (not any(entity.x == x and entity.y ==y for entity in dungeon.entities)) and (not (x ,y)== dungeon.upstairs_location):
             entity.spawn(dungeon,x,y)
-            if entity.fighter:
+            if hasattr(entity,"fighter"):
                 entity.fighter.set_max_hp()
 
 def tunnel_between(start: Tuple[int,int],end: Tuple[int,int])->Iterator[Tuple[int,int]]:

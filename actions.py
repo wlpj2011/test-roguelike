@@ -46,7 +46,7 @@ class PickupAction(Action):
                 item.parent = self.entity.inventory
 
                 inventory.items.append(item)
-                
+
                 self.engine.message_log.add_message(f"You picked up the {item.name}.")
                 return
         raise exceptions.Impossible("There is nothing here to pick up.")
@@ -146,8 +146,8 @@ class MeleeAction(ActionWithDirection):
 
         # TODO: Change this method, really don't like this, or maybe just needs balancing
         if random.randint(1,20) + self.entity.fighter.strength_mod >= target.fighter.defense:
-            damage_die = self.entity.fighter.damage_die
-            die_number = self.entity.fighter.die_number
+            damage_die = self.entity.fighter.damage_die_size
+            die_number = self.entity.fighter.damage_die_number
             damage = 0
             for i in range(die_number):
                 damage += random.randint(1,damage_die)
@@ -159,6 +159,7 @@ class MeleeAction(ActionWithDirection):
                 target.fighter.hp -= damage
             else:
                 self.engine.message_log.add_message(f"{attack_desc} but does no damage",attack_color)
+            print(target.fighter.hp)
         else:
             self.engine.message_log.add_message(f"{attack_desc} but misses.",attack_color)
 
