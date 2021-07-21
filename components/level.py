@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import random
+
 from components.base_component import BaseComponent
 
 if TYPE_CHECKING:
@@ -45,11 +47,16 @@ class Level(BaseComponent):
     def increase_level(self)->None:
         self.current_xp -= self.experience_to_next_level
         self.current_level += 1
+        self.parent.fighter.hit_dice_num += 1
+        new_hp = max(1,random.randint(1,self.parent.fighter.hit_dice_size)+self.parent.fighter.constitution_mod)
+        self.parent.fighter.max_hp += new_hp
+        self.parent.fighter.hp += new_hp
 
-    def increase_max_hp(self, amount: int = 20)->None:
-        self.parent.fighter.max_hp += amount
-        self.parent.fighter.hp += amount
-        self.engine.message_log.add_message("Your health improves.")
+    def increase_constitution(self, amount: int = 20)->None:
+        self.parent.fighter.base_constitution += 1
+        if self.parent.fighter.base_constitution % 2 == 0:
+            self.parent.fighter.max_hp += self.parent.fighter.hit_dice_num
+        self.engine.message_log.add_message("Your feel hardier.")
         self.increase_level()
 
     def increase_strength(self, amount: int = 1)->None:
@@ -58,6 +65,11 @@ class Level(BaseComponent):
         self.increase_level()
 
     def increase_agility(self, amount: int = 1)->None:
-        self.parent.fighter.base_agility += amount
+        self.parent.fighter.base_dexterity += amount
         self.engine.message_log.add_message("You feel swifter.")
+        self.increase_level()
+
+    def increase_intelligence(self, amount: int = 1)->None:
+        self.parent.fighter.base_intelligence += amount
+        self.engine.message_log.add_message("You feel smarter.")
         self.increase_level()
