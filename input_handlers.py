@@ -195,7 +195,7 @@ class CharacterScreenEventHandler(AskUserEventHandler):
             x = x,
             y = y,
             width = width,
-            height = 7,
+            height = 9,
             title = self.TITLE,
             clear = True,
             fg = (255,255,255),
@@ -215,7 +215,13 @@ class CharacterScreenEventHandler(AskUserEventHandler):
             x=x + 1, y=y + 4, string=f"Strength: {self.engine.player.fighter.base_strength}"
         )
         console.print(
-            x=x + 1, y=y + 5, string=f"Agility: {self.engine.player.fighter.base_agility}"
+            x=x + 1, y=y + 5, string=f"Dexterity: {self.engine.player.fighter.base_dexterity}"
+        )
+        console.print(
+            x=x + 1, y=y + 6, string=f"Constitution: {self.engine.player.fighter.base_constitution}"
+        )
+        console.print(
+            x=x + 1, y=y + 7, string=f"Intelligence: {self.engine.player.fighter.base_intelligence}"
         )
 
 class LevelUpEventHandler(AskUserEventHandler):
@@ -224,14 +230,14 @@ class LevelUpEventHandler(AskUserEventHandler):
     def on_render(self, console: tcod.Console) -> None:
         super().on_render(console)
         if self.engine.player.x <= 30:
-            x = 40
+            x = 35
         else:
             x = 0
         console.draw_frame(
             x = x,
             y = 0,
-            width = 35,
-            height = 8,
+            width = 50,
+            height = 10,
             title = self.TITLE,
             clear = True,
             fg = (255,255,255),
@@ -244,17 +250,22 @@ class LevelUpEventHandler(AskUserEventHandler):
         console.print(
             x = x + 1,
             y = 4,
-            string = f"a) Constitution (+20 HP, from {self.engine.player.fighter.max_hp})",
+            string = f"a) Constitution (+1 Constitution, from {self.engine.player.fighter.base_constitution})",
         )
         console.print(
             x = x + 1,
             y = 5,
-            string = f"b) Strength (+1 attack, from {self.engine.player.fighter.base_strength})",
+            string = f"b) Strength (+1 Strength, from {self.engine.player.fighter.base_strength})",
         )
         console.print(
             x = x + 1,
             y = 6,
-            string = f"c) Agility (+1 defense, from {self.engine.player.fighter.base_agility})",
+            string = f"c) Dexterity (+1 Dexterity, from {self.engine.player.fighter.base_dexterity})",
+        )
+        console.print(
+            x = x + 1,
+            y = 7,
+            string = f"d) Intelligence (+1 Dexterity, from {self.engine.player.fighter.base_intelligence})",
         )
 
     def ev_keydown(self, event: tcod.event.KeyDown)->Optional[ActionOrHandler]:
@@ -262,13 +273,15 @@ class LevelUpEventHandler(AskUserEventHandler):
         key = event.sym
         index = key - tcod.event.K_a
 
-        if 0<= index <= 2:
+        if 0<= index <= 3:
             if index == 0:
-                player.level.increase_max_hp()
+                player.level.increase_constitution()
             elif index == 1:
                 player.level.increase_strength()
-            else:
+            elif index == 2:
                 player.level.increase_agility()
+            else:
+                player.level.increase_intelligence()
         else:
             self.engine.message_log.add_message("Invalid entry.", color.invalid)
             return None

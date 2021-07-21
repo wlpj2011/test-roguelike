@@ -41,7 +41,6 @@ def new_game()->Engine:
 
     engine.game_world.generate_floor()
     engine.player.place(*engine.game_map.upstairs_location,engine.game_map)
-    engine.player.fighter.set_max_hp()
     engine.update_fov()
 
     engine.message_log.add_message(

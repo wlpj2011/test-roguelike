@@ -159,7 +159,6 @@ class MeleeAction(ActionWithDirection):
                 target.fighter.hp -= damage
             else:
                 self.engine.message_log.add_message(f"{attack_desc} but does no damage",attack_color)
-            print(target.fighter.hp)
         else:
             self.engine.message_log.add_message(f"{attack_desc} but misses.",attack_color)
 

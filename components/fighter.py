@@ -26,7 +26,6 @@ class Fighter(BaseComponent):
         damage_die_number: int,
         resistance: int = 0,
     ):
-        self.max_hp = 0
         self.hit_dice_num = hit_dice_num
         self.hit_dice_size = hit_dice_size
         self.base_strength = base_strength
@@ -36,6 +35,11 @@ class Fighter(BaseComponent):
         self.damage_die_size = damage_die_size
         self.damage_die_number = damage_die_number
         self.resistance = resistance
+        self.max_hp = max(1,self.hit_dice_size + self.constitution_mod)
+        if self.hit_dice_num > 1:
+            for i in range(0,self.hit_dice_num-1):
+                self.max_hp += max(1,random.randint(1,self.hit_dice_size) + self.constitution_mod)
+        self.hp = self.max_hp
 
     @property
     def strength_mod(self)->int:
@@ -62,27 +66,26 @@ class Fighter(BaseComponent):
     @hp.setter
     def hp(self,value: int)-> None:
         self._hp = max(0,min(value,self.max_hp))
-        print(self._hp)
-        if self._hp == 0 and self.parent.ai and self.max_hp != 0:
+        if self._hp == 0 and self.parent.ai:
             self.die()
 
-    def set_max_hp(self)->None:
-        if hasattr(self,"hp"):
-            pass
-        else:
-            self._hp = self.max_hp
-
-        old_max_hp = self.max_hp
-
-        self.max_hp = max(1,self.hit_dice_size + self.constitution_mod)
-        if self.hit_dice_num > 1:
-            for i in range(0,self.hit_dice_num-1):
-                self.max_hp += max(1,random.randint(1,self.hit_dice_size) + self.constitution_mod)
-        if self.hp == 0 :
-            self._hp = self.max_hp
-        elif old_max_hp != 0:
-            self.heal(self.max_hp - old_max_hp)
-        print(self.hp)
+    # def set_max_hp(self)->None:
+    #     if hasattr(self,"hp"):
+    #         pass
+    #     else:
+    #         self._hp = self.max_hp
+    #
+    #     old_max_hp = self.max_hp
+    #
+    #     self.max_hp = max(1,self.hit_dice_size + self.constitution_mod)
+    #     if self.hit_dice_num > 1:
+    #         for i in range(0,self.hit_dice_num-1):
+    #             self.max_hp += max(1,random.randint(1,self.hit_dice_size) + self.constitution_mod)
+    #     if self.hp == 0 :
+    #         self._hp = self.max_hp
+    #     elif old_max_hp != 0:
+    #         self.heal(self.max_hp - old_max_hp)
+    #     # print(self.hp)
 
 
     @property
