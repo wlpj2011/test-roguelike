@@ -148,6 +148,9 @@ class MeleeAction(ActionWithDirection):
         if random.randint(1,20) + self.entity.fighter.strength_mod >= target.fighter.defense:
             damage_die = self.entity.fighter.damage_die_size
             die_number = self.entity.fighter.damage_die_number
+            if self.entity.equipment.weapon:
+                damage_die = self.entity.equipment.weapon.equippable.damage_die_size
+                die_number = self.entity.equipment.weapon.equippable.damage_die_number
             damage = 0
             for i in range(die_number):
                 damage += random.randint(1,damage_die)

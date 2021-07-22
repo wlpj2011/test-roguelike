@@ -94,7 +94,7 @@ class Fighter(BaseComponent):
 
     @property
     def damage_mod(self)->int:
-        return self.strength_mod + self.power_bonus
+        return self.strength_mod # + self.power_bonus
 
     @property
     def defense_bonus(self)->int:
@@ -103,12 +103,12 @@ class Fighter(BaseComponent):
         else:
             return 0
 
-    @property
-    def power_bonus(self)->int:
-        if self.parent.equipment:
-            return self.parent.equipment.power_bonus
-        else:
-            return 0
+    # @property
+    # def power_bonus(self)->int:
+    #     if self.parent.equipment:
+    #         return self.parent.equipment.power_bonus
+    #     else:
+    #         return 0
 
     def heal(self, amount: int)->int:
         if self.hp==self.max_hp:

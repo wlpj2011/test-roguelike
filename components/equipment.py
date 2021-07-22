@@ -28,16 +28,17 @@ class Equipment(BaseComponent):
         return bonus
 
     @property
-    def power_bonus(self)->int:
-        bonus = 0
+    def damage_die(self)->int:
+        die1 = 0
+        die2 = 0
 
         if self.weapon is not None and self.weapon.equippable is not None:
-            bonus += self.weapon.equippable.power_bonus
+            die1 += self.weapon.equippable.damage_die
 
         if self.armor is not None and self.armor.equippable is not None:
-            bonus += self.armor.equippable.power_bonus
+            die2 += self.armor.equippable.damage_die
 
-        return bonus
+        return max(die1,die2)
 
     def item_is_equipped(self, item: Item)-> bool:
         return self.weapon == item or self.armor == item
