@@ -42,7 +42,7 @@ class Engine:
 
     def render(self, console: Console)->None:
         self.game_map.render(console)
-        render_functions.render_bar(console = console,
+        render_functions.render_health_bar(console = console,
             current_value = self.player.fighter.hp,
             maximum_value = self.player.fighter.max_hp,
             total_width = 20
