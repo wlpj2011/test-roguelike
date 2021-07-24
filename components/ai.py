@@ -41,7 +41,7 @@ class ConfusedEnemy(BaseAI):
         self.previous_ai = previous_ai
         self.turns_remaining = turns_remaining
 
-    def perform(self)->None:
+    def next_action(self)->None:
         if self.turns_remaining <= 0:
             self.engine.message_log.add_message(f"The {self.entity.name} is no longer confused.")
             self.entity.ai = self.previous_ai
@@ -59,7 +59,7 @@ class ConfusedEnemy(BaseAI):
                 ]
             )
             self.turns_remaining -= 1
-            return BumpAction(self.entity, direction_x, direction_y,).perform()
+            return BumpAction(self.entity, direction_x, direction_y,)
 
 
 class HostileEnemy(BaseAI):
@@ -67,7 +67,7 @@ class HostileEnemy(BaseAI):
         super().__init__(entity)
         self.path: List[Tuple[int,int]]=[]
 
-    def perform(self)->None:
+    def next_action(self)->None:
         target = self.engine.player
         dx = target.x - self.entity.x
         dy = target.y - self.entity.y
@@ -80,7 +80,7 @@ class HostileEnemy(BaseAI):
 
         if self.path:
             dest_x,dest_y = self.path.pop(0)
-            return MovementAction(self.entity,dest_x - self.entity.x,dest_y-self.entity.y).perform()
+            return MovementAction(self.entity,dest_x - self.entity.x,dest_y-self.entity.y)
 
         # direction_x, direction_y = random.choice(
         #     [
@@ -97,4 +97,4 @@ class HostileEnemy(BaseAI):
         # TODO: Implement random motion when can't see player.
         # return BumpAction(self.entity, direction_x, direction_y,).perform()
 
-        return WaitAction(self.entity).perform()
+        return WaitAction(self.entity)

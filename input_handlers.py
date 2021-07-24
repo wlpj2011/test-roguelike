@@ -140,14 +140,22 @@ class EventHandler(BaseEventHandler):
         Returns True if the action will advance a turn."""
         if action is None:
             return False
+
+        self.engine.action_queue.schedule_action(action,action.delay)
+        delay = action.delay
+        self.engine.handle_enemy_turns()
+
+        while self.engine.action_queue.next_actor() is not self.engine.player:
+            self.engine.action_queue.next_action().perform()
+
         try:
-            action.perform()
+            self.engine.action_queue.next_action().perform()
         except exceptions.Impossible as exc:
             self.engine.message_log.add_message(exc.args[0],color.impossible)
             return False
 
-        self.engine.handle_enemy_turns()
         self.engine.update_fov()
+        self.engine.game_turn += delay
         return True
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion)->None:

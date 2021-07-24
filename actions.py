@@ -12,9 +12,11 @@ if TYPE_CHECKING:
 
 
 class Action:
-    def __init__(self, entity:Actor):
+    def __init__(self, entity:Actor, base_delay:float = 1.0):
         super().__init__()
         self.entity = entity
+        self.base_delay = base_delay
+        self.delay = base_delay / self.entity.speed
 
     @property
     def engine(self)->Engine:
@@ -30,8 +32,8 @@ class Action:
 
 class PickupAction(Action):
     """Pickup an item and add it to the inventory, if there is room for it."""
-    def __init__(self, entity: Actor):
-        super().__init__(entity)
+    def __init__(self, entity: Actor, base_delay: float = 0.5):
+        super().__init__(entity,base_delay)
 
     def perform(self) -> None:
         actor_location_x = self.entity.x
@@ -52,8 +54,8 @@ class PickupAction(Action):
         raise exceptions.Impossible("There is nothing here to pick up.")
 
 class ItemAction(Action):
-    def __init__(self, entity: Actor, item: Item, target_xy: Optional[Tuple[int,int]] = None):
-        super().__init__(entity)
+    def __init__(self, entity: Actor, item: Item, base_delay: float = 0.5, target_xy: Optional[Tuple[int,int]] = None):
+        super().__init__(entity,base_delay)
         self.item = item
         if not target_xy:
             target_xy = entity.x, entity.y
@@ -83,6 +85,7 @@ class EquipAction(ItemAction):
 
 class WaitAction(Action):
     def perform(self)->None:
+        self.delay = 1.0
         if random.random()<0.2: #regen rate
             self.entity.fighter.heal(1)
 
@@ -111,8 +114,8 @@ class TakeUpStairsAction(Action):
             raise exceptions.Impossible("There are no stairs here.")
 
 class ActionWithDirection(Action):
-    def __init__(self, entity: Actor, dx: int, dy: int):
-        super().__init__(entity)
+    def __init__(self, entity: Actor, dx: int, dy: int, base_delay: float = 1.0,):
+        super().__init__(entity,base_delay)
         self.dx = dx
         self.dy = dy
 

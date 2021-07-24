@@ -7,6 +7,7 @@ from components.level import Level
 from entity import Actor, Item
 
 player = Actor(
+    speed = 1.0,
     char = "@",
     color = (255,255,255),
     name = "Player",
@@ -28,6 +29,7 @@ player = Actor(
 )
 
 goblin = Actor(
+    speed = 0.75,
     char = "g",
     color = (63,127,63),
     name = "Goblin",
@@ -49,6 +51,7 @@ goblin = Actor(
 )
 
 orc = Actor(
+    speed = 0.75,
     char = "o",
     color = (63,127,63),
     name = "Orc",
@@ -70,6 +73,7 @@ orc = Actor(
 )
 
 troll = Actor(
+    speed = 0.5,
     char = "T",
     color = (0,127,0),
     name = "Troll",

@@ -89,6 +89,7 @@ class Actor(Entity):
         *,
         x: int = 0,
         y: int = 0,
+        speed: float = 1.0,
         char: str = "?",
         color: Tuple[int,int,int] = (255,255,255),
         name: str = "<Unnamed>",
@@ -104,6 +105,8 @@ class Actor(Entity):
             name=name,
             blocks_movement=True,
             render_order=RenderOrder.ACTOR)
+
+        self.speed = speed
 
         self.ai: Optional[BaseAI] = ai_cls(self)
 

@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 import traceback
+import sys
 
 import tcod
 
@@ -54,4 +55,6 @@ def main() -> None:
 
 
 if __name__=="__main__":
+    if len(sys.argv) > 1:
+        mode = sys.argv[1]
     main()
