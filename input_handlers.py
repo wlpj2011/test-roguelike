@@ -146,7 +146,13 @@ class EventHandler(BaseEventHandler):
         self.engine.handle_enemy_turns()
 
         while self.engine.action_queue.next_actor() is not self.engine.player:
-            self.engine.action_queue.next_action().perform()
+            action = self.engine.action_queue.next_action()
+            if not action.can_perform():
+                print(False)
+            else:
+                action.perform()
+            #else:
+                ## TODO: make AI pick new action and insert into action_queue with reduced delay.
 
         try:
             self.engine.action_queue.next_action().perform()

@@ -30,6 +30,9 @@ class Action:
          """
          raise NotImplementedError()
 
+    def can_perform(self)->Bool:
+        raise NotImplementedError()
+
 class PickupAction(Action):
     """Pickup an item and add it to the inventory, if there is room for it."""
     def __init__(self, entity: Actor, base_delay: float = 0.5):
@@ -53,6 +56,17 @@ class PickupAction(Action):
                 return
         raise exceptions.Impossible("There is nothing here to pick up.")
 
+    def can_perform(self)->Bool:
+        actor_location_x = self.entity.x
+        actor_location_y = self.entity.y
+        inventory = self.entity.inventory
+        if inventory.current_size > inventory.capacity:
+            return False
+        for item in self.engine.game_map.items:
+            if actor_location_x == item.x and actor_location_y == item.y:
+                return True
+        return False
+
 class ItemAction(Action):
     def __init__(self, entity: Actor, item: Item, base_delay: float = 0.5, target_xy: Optional[Tuple[int,int]] = None):
         super().__init__(entity,base_delay)
@@ -69,11 +83,17 @@ class ItemAction(Action):
         if self.item.consumable:
             self.item.consumable.activate(self)
 
+    def can_perform(self)->Bool:
+        return True
+
 class DropItem(ItemAction):
     def perform(self)->None:
         if self.entity.equipment.item_is_equipped(self.item):
             self.entity.equipment.toggle_equip(self.item)
         self.entity.inventory.drop(self.item)
+
+    def can_perform(self)->Bool:
+        return True
 
 class EquipAction(ItemAction):
     def __init__(self, entity: Actor, item: Item):
@@ -83,11 +103,17 @@ class EquipAction(ItemAction):
     def perform(self)->None:
         self.entity.equipment.toggle_equip(self.item)
 
+    def can_perform(self)->Bool:
+        return True
+
 class WaitAction(Action):
     def perform(self)->None:
         self.delay = 1.0
         if random.random()<0.2: #regen rate
             self.entity.fighter.heal(1)
+
+    def can_perform(self)->Bool:
+        return True
 
 class TakeDownStairsAction(Action):
     def perform(self)->None:
@@ -102,6 +128,11 @@ class TakeDownStairsAction(Action):
         else:
             raise exceptions.Impossible("There are no stairs here.")
 
+    def can_perform(self)->Bool:
+        if self.engine.game_map.tiles[(self.entity.x,self.entity.y)]==tile_types.down_stairs:
+            return True
+        return False
+
 class TakeUpStairsAction(Action):
     def perform(self)->None:
         """Take the stairs, if any exist at the entity's location."""
@@ -112,6 +143,11 @@ class TakeUpStairsAction(Action):
             self.engine.message_log.add_message(f"You ascend the staircase and enter the {self.engine.game_world.current_floor} floor.", color.descend)
         else:
             raise exceptions.Impossible("There are no stairs here.")
+
+    def can_perform(self)->Bool:
+        if self.engine.game_map.tiles[(self.entity.x,self.entity.y)]==tile_types.up_stairs:
+            return True
+        return False
 
 class ActionWithDirection(Action):
     def __init__(self, entity: Actor, dx: int, dy: int, base_delay: float = 1.0,):
@@ -133,6 +169,9 @@ class ActionWithDirection(Action):
 
     def perform(self)->None:
         raise NotImplementedError()
+
+    def can_perform(self)->Bool:
+        return False
 
 class MeleeAction(ActionWithDirection):
     def perform(self)->None:
@@ -168,6 +207,12 @@ class MeleeAction(ActionWithDirection):
         else:
             self.engine.message_log.add_message(f"{attack_desc} but misses.",attack_color)
 
+    def can_perform(self)->Bool:
+        target = self.target_actor
+        if not target:
+            return False
+        return True
+
 class MovementAction(ActionWithDirection):
     def perform(self)->None:
         dest_x, dest_y = self.dest_xy
@@ -182,9 +227,25 @@ class MovementAction(ActionWithDirection):
         if random.random()<0.05: #regen rate
             self.entity.fighter.heal(1)
 
+    def can_perform(self)->Bool:
+        dest_x, dest_y = self.dest_xy
+        if not self.engine.game_map.in_bounds(dest_x,dest_y):
+            return False
+        elif not self.engine.game_map.tiles["walkable"][dest_x,dest_y]:
+            return False
+        elif self.engine.game_map.get_blocking_entity_at_location(dest_x,dest_y):
+            return False
+        return True
+
 class BumpAction(ActionWithDirection):
     def perform(self)->None:
         if self.target_actor:
             MeleeAction(self.entity,self.dx,self.dy).perform()
         else:
             MovementAction(self.entity,self.dx,self.dy).perform()
+
+    def can_perform(self)->Bool:
+        if self.target_actor:
+            MeleeAction(self.entity,self.dx,self.dy).can_perform()
+        else:
+            MovementAction(self.entity,self.dx,self.dy).can_perform()
