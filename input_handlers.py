@@ -147,10 +147,18 @@ class EventHandler(BaseEventHandler):
 
         while self.engine.action_queue.next_actor() is not self.engine.player:
             action = self.engine.action_queue.next_action()
+            action.entity.time_since_action += action.delay
+            # print(action.entity.time_since_action)
+
             if not action.can_perform():
-                print(False)
+                action = action.entity.ai.next_action()
+                if action:
+                    print("reschedule")
+                    self.engine.action_queue.schedule_action(action,action.delay - action.entity.time_since_action)
             else:
+                action.entity.time_since_action = 0
                 action.perform()
+
             #else:
                 ## TODO: make AI pick new action and insert into action_queue with reduced delay.
 

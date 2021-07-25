@@ -97,7 +97,8 @@ class Actor(Entity):
         equipment: Equipment,
         fighter: Fighter,
         inventory: Inventory,
-        level: Level
+        level: Level,
+        time_since_action: float = 0.0,
     ):
         super().__init__(x=x,y=y,
             char=char,
@@ -107,7 +108,8 @@ class Actor(Entity):
             render_order=RenderOrder.ACTOR)
 
         self.speed = speed
-
+        self.time_since_action = time_since_action
+        
         self.ai: Optional[BaseAI] = ai_cls(self)
 
         self.equipment: Equipment = equipment
